@@ -3,22 +3,21 @@ package com.electiva.cine.api;
 
 import com.electiva.cine.dto.LoginRequestDto;
 import com.electiva.cine.dto.LoginResponseDto;
-import com.electiva.cine.entity.UserEntity;
+import com.electiva.cine.dto.ServiceResponseDto;
+import com.electiva.cine.dto.UserDto;
 import com.electiva.cine.security.jwt.JwtUtil;
 import com.electiva.cine.services.MyUserDetailsService;
 import com.electiva.cine.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+
 
 @RestController
 public class UserAPI {
@@ -39,16 +38,20 @@ public class UserAPI {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword()));
-        }catch(BadCredentialsException be){
+        }catch(Exception be){
             throw new Exception("Bad username or password",be);
         }
-        UserDetails userDetails = myUserDetailsService.loadUserByUsername(loginRequestDto.getUsername());
-        String jwt = jwtUtil.generateToken(userDetails);
+        String jwt = jwtUtil.generateToken(myUserDetailsService.loadUserByUsername(loginRequestDto.getUsername()));
         return ResponseEntity.ok(new LoginResponseDto(jwt));
     }
 
-    @GetMapping("/users")
-    public List<UserEntity> getUsers(){
-        return userService.findAll();
+    @PostMapping("/admin/users")
+    public ResponseEntity<?> createAdminUser(@RequestBody UserDto userDto){
+        ServiceResponseDto serviceResponseDto = userService.createAdminUser(userDto);
+        if(serviceResponseDto.getCode().equals("OK")){
+            return ResponseEntity.status(HttpStatus.OK).body(serviceResponseDto);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(serviceResponseDto);
+        }
     }
 }

@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -41,8 +40,8 @@ public class UserEntity  implements UserDetails {
     @Column(name="apellido")
     private String lastName;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id", referencedColumnName = "id_role")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_role")
     private RoleEntity roles;
 
     @Override

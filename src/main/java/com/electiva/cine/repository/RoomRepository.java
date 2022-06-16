@@ -1,10 +1,9 @@
 package com.electiva.cine.repository;
 
-import com.electiva.cine.entity.RoleEntity;
+import com.electiva.cine.entity.RoomEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RolRepository extends JpaRepository<RoleEntity, Long> {
-    RoleEntity findByDescription(String desc);
+public interface RoomRepository extends JpaRepository<RoomEntity, Long> {
 }
